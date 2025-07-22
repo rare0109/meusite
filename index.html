@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Escolher Perfil</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+
+  body {
+    height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+    position: relative;
+    background: 
+      linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+      url('https://media.discordapp.net/attachments/1376785332577505293/1397020828985720863/IMG_9076.jpg?ex=68803489&is=687ee309&hm=831f9a15a7b33b20613f3a31110e79fb69aff333cdef2ca1f68a6bb2f5069166&=&format=webp&width=486&height=864') no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  .bubbles-container {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.06;
+    filter: blur(1.5px);
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    mix-blend-mode: multiply;
+  }
+
+.container {
+  max-width: 440px;
+  width: 100%;
+  padding: 48px 32px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+  user-select: none;
+}
+
+  h1 {
+    font-weight: 600;
+    font-size: 1.9rem;
+    color: #ddd;
+    margin-bottom: 40px;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+
+  .profiles {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .profile {
+    cursor: pointer;
+    color: #ddd;
+    font-weight: 600;
+    font-size: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s ease;
+    border-radius: 20px;
+    padding: 16px;
+    background: rgba(255 255 255 / 0.06); /* menos opaco */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    user-select: none;
+    outline-offset: 4px;
+  }
+
+  .profile:focus {
+    outline: 3px solid #9cc6ff;
+    outline-offset: 6px;
+  }
+
+  .profile:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 26px rgba(0,0,0,0.3);
+    background: rgba(255 255 255 / 0.10);
+  }
+
+  /* Vamos colocar pulse na avatar e no texto nome junto */
+  .avatar,
+  .profile > :last-child { /* o texto é o último filho direto do .profile */
+    animation: pulseAvatar 3.5s ease-in-out infinite;
+  }
+
+  .avatar {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 14px;
+    transition: box-shadow 0.3s ease;
+    box-shadow: 0 0 0 3px rgba(255 255 255 / 0.12);
+  }
+
+  .profile:hover .avatar {
+    box-shadow: 0 0 12px 3px rgba(156,198,255,0.6);
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .modal-backdrop.active {
+    display: flex;
+  }
+
+  .modal {
+    background: #222;
+    padding: 32px 36px;
+    border-radius: 16px;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 14px 48px rgba(0,0,0,0.75);
+    text-align: center;
+    color: #eee;
+    user-select: none;
+  }
+
+  .modal button {
+    width: 100%;
+    padding: 14px 0;
+    margin: 14px 0;
+    border: none;
+    border-radius: 12px;
+    background-color: #eee;
+    color: #222;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 6px 12px rgba(255,255,255,0.25);
+  }
+
+  .modal button:hover,
+  .modal button:focus {
+    background-color: #fff;
+    box-shadow: 0 10px 20px rgba(255,255,255,0.6);
+    outline: none;
+  }
+
+  .avatar-history {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(80px,1fr));
+    gap: 16px;
+    margin-top: 24px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 6px;
+    border: 2px solid #555;
+    border-radius: 14px;
+    padding: 14px;
+    background-color: #111;
+    user-select: none;
+  }
+
+  .avatar-history img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    object-fit: cover;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .avatar-history img.selected,
+  .avatar-history img:hover {
+    border-color: #eee;
+    box-shadow: 0 0 10px #eeeaaaff;
+  }
+
+  #avatarUploadInput {
+    display: none;
+  }
+
+  .upload-label {
+    display: inline-block;
+    margin-top: 18px;
+    background-color: #eee;
+    color: #222;
+    font-weight: 600;
+    padding: 14px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    font-size: 1.1rem;
+    border: none;
+    user-select: none;
+    box-shadow: 0 6px 12px rgba(255,255,255,0.25);
+  }
+  .upload-label:hover,
+  .upload-label:focus {
+    background-color: #fff;
+    box-shadow: 0 10px 20px rgba(255,255,255,0.6);
+    outline: none;
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 36px 24px;
+      max-width: 320px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 32px;
+    }
+
+    .profiles {
+      flex-wrap: nowrap;          /* mantém numa linha só */
+      justify-content: center;    /* centraliza os perfis */
+      gap: 16px;                  /* espaçamento menor para caber */
+    }
+
+    .profile {
+      font-size: 1rem;
+      padding: 12px;
+      flex: 1 1 45%;              /* ocupa até 45% da largura do container */
+      max-width: 45%;             /* limita a largura máxima */
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+    }
+
+    .modal {
+      padding: 28px 24px;
+      max-width: 280px;
+    }
+
+    .modal button,
+    .upload-label {
+      font-size: 1rem;
+      padding: 12px 0;
+    }
+
+    .avatar-history {
+      grid-template-columns: repeat(auto-fit,minmax(60px,1fr));
+      max-height: 160px;
+      padding: 10px;
+      gap: 12px;
+    }
+
+    .avatar-history img {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  @keyframes bubbleFade {
+    0%, 100% {opacity: 0.05;}
+    50% {opacity: 0.15;}
+  }
+
+  @keyframes pulseContainer {
+    0%, 100% {transform: scale(1);}
+    50% {transform: scale(1.015);}
+  }
+
+  @keyframes pulseAvatar {
+    0%, 100% {transform: scale(1);}
+    50% {transform: scale(1.08);}
+  }
+</style>
+</head>
+<body>
+  <div class="bubbles-container" aria-hidden="true"></div>
+
+  <div class="container" role="main">
+    <div class="profiles">
+      <div class="profile" data-user="rare" tabindex="0" aria-label="Perfil rare, abrir opções">
+        <div class="avatar">
+          <img src="https://i.pravatar.cc/140?img=5" alt="rare" />
+        </div>
+        rare
+      </div>
+      <div class="profile" data-user="stocaa" tabindex="0" aria-label="Perfil stocaa, abrir opções">
+        <div class="avatar">
+          <img src="https://i.pravatar.cc/140?img=12" alt="stocaa" />
+        </div>
+        stocaa
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal" role="document">
+      <button id="goRoutineBtn" aria-label="Ir para a rotina">Routine</button>
+      <button id="changeAvatarBtn" aria-label="Trocar foto de perfil">Change Profile</button>
+
+      <div class="avatar-history" id="avatarHistory" style="display:none;" aria-label="Histórico de avatares"></div>
+      <label for="avatarUploadInput" class="upload-label" style="display:none;" id="uploadLabel">Enviar imagem própria</label>
+      <input type="file" id="avatarUploadInput" accept="image/*" />
+    </div>
+  </div>
+
+<script>
+  const bubblesContainer = document.querySelector('.bubbles-container');
+
+  function random(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function createBubble() {
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+
+    const size = random(12, 28);
+    bubble.style.width = size + 'px';
+    bubble.style.height = size + 'px';
+
+    bubble.style.top = random(0, 100) + 'vh';
+    bubble.style.left = random(0, 100) + 'vw';
+
+    const colors = [
+      'rgba(255,255,255,0.08)',
+      'rgba(255,255,255,0.05)',
+      'rgba(230,230,230,0.06)'
+    ];
+    bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+    const duration = random(9, 20);
+    bubble.style.animation = `bubbleFade ${duration}s ease-in-out infinite`;
+    bubble.style.animationDelay = random(0, duration) + 's';
+
+    bubblesContainer.appendChild(bubble);
+
+    bubble.animate(
+      [
+        { transform: `translateX(0px)` },
+        { transform: `translateX(${random(-40, 40)}px)` },
+        { transform: `translateX(0px)` }
+      ],
+      {
+        duration: duration * 1000,
+        iterations: Infinity,
+        easing: 'ease-in-out',
+        delay: random(0, duration) * 1000
+      }
+    );
+
+    return bubble;
+  }
+
+  for(let i=0; i<30; i++) {
+    createBubble();
+  }
+
+  const profiles = document.querySelectorAll('.profile');
+  const modal = document.getElementById('modalBackdrop');
+  const goRoutineBtn = document.getElementById('goRoutineBtn');
+  const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+  const avatarHistory = document.getElementById('avatarHistory');
+  const uploadLabel = document.getElementById('uploadLabel');
+  const avatarUploadInput = document.getElementById('avatarUploadInput');
+
+  let selectedUser = null;
+  let currentAvatar = null;
+
+  function openModal(user) {
+    selectedUser = user;
+    modal.classList.add('active');
+
+    avatarHistory.style.display = 'none';
+    uploadLabel.style.display = 'none';
+
+    goRoutineBtn.style.display = 'block';
+    changeAvatarBtn.style.display = 'block';
+
+    goRoutineBtn.focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove('active');
+    selectedUser = null;
+    currentAvatar = null;
+    clearAvatarSelection();
+  }
+
+  function loadSavedAvatar(user) {
+    return localStorage.getItem(`avatar_${user}`) || null;
+  }
+
+  function updateUserAvatar(user, avatarUrl) {
+    localStorage.setItem(`avatar_${user}`, avatarUrl);
+    const profileDiv = [...profiles].find(p => p.getAttribute('data-user') === user);
+    if (profileDiv) {
+      const avatarImg = profileDiv.querySelector('img');
+      avatarImg.src = avatarUrl;
+    }
+  }
+
+  function buildAvatarHistory(user) {
+    avatarHistory.innerHTML = '';
+
+    let avatars = [];
+
+    const storedList = localStorage.getItem(`avatarHistory_${user}`);
+    if(storedList) {
+      try {
+        avatars = JSON.parse(storedList);
+      } catch {
+        avatars = [];
+      }
+    }
+
+    const savedAvatar = loadSavedAvatar(user);
+    if(savedAvatar && !avatars.includes(savedAvatar)) {
+      avatars.unshift(savedAvatar);
+    }
+
+    avatars = [...new Set(avatars)];
+
+    avatars.forEach(url => {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Avatar histórico';
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      img.style.borderColor = (url === savedAvatar) ? '#eee' : 'transparent';
+
+      img.addEventListener('click', () => {
+        currentAvatar = url;
+        updateUserAvatar(user, url);
+        closeModal();
+      });
+
+      img.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          img.click();
+        }
+      });
+
+      avatarHistory.appendChild(img);
+    });
+  }
+
+  function addAvatarToHistory(user, avatarUrl) {
+    let avatars = [];
+    const storedList = localStorage.getItem(`avatarHistory_${user}`);
+    if(storedList) {
+      try {
+        avatars = JSON.parse(storedList);
+      } catch {
+        avatars = [];
+      }
+    }
+    avatars.unshift(avatarUrl);
+
+    avatars = [...new Set(avatars)];
+
+    if(avatars.length > 10) avatars = avatars.slice(0,10);
+
+    localStorage.setItem(`avatarHistory_${user}`, JSON.stringify(avatars));
+  }
+
+  function clearAvatarSelection() {
+    const imgs = avatarHistory.querySelectorAll('img');
+    imgs.forEach(img => {
+      img.style.borderColor = 'transparent';
+      img.classList.remove('selected');
+    });
+  }
+
+  profiles.forEach(profile => {
+    profile.addEventListener('click', () => {
+      openModal(profile.getAttribute('data-user'));
+    });
+    profile.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openModal(profile.getAttribute('data-user'));
+      }
+    });
+  });
+
+  goRoutineBtn.addEventListener('click', () => {
+    if(selectedUser) {
+      window.location.href = `rotina.html?user=${encodeURIComponent(selectedUser)}`;
+    }
+  });
+
+  changeAvatarBtn.addEventListener('click', () => {
+    goRoutineBtn.style.display = 'none';
+    changeAvatarBtn.style.display = 'none';
+
+    avatarHistory.style.display = 'grid';
+    uploadLabel.style.display = 'inline-block';
+
+    buildAvatarHistory(selectedUser);
+
+    const firstAvatar = avatarHistory.querySelector('img');
+    if(firstAvatar) firstAvatar.focus();
+  });
+
+  avatarUploadInput.addEventListener('change', () => {
+    const file = avatarUploadInput.files[0];
+    if(!file) return;
+
+    if(!file.type.startsWith('image/')) {
+      alert('Por favor, selecione um arquivo de imagem válido.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+
+      updateUserAvatar(selectedUser, dataUrl);
+      addAvatarToHistory(selectedUser, dataUrl);
+
+      closeModal();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  modal.addEventListener('click', e => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      closeModal();
+    }
+  });
+
+  window.addEventListener('load', () => {
+    profiles.forEach(profile => {
+      const user = profile.getAttribute('data-user');
+      const savedAvatar = loadSavedAvatar(user);
+      if (savedAvatar) {
+        const avatarImg = profile.querySelector('img');
+        avatarImg.src = savedAvatar;
+      }
+    });
+  });
+</script>
+</body>
+</html>
