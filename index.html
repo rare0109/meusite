@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Escolher Perfil</title>
 <style>
+  /* seu CSS original permanece o mesmo */
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
   *, *::before, *::after {
@@ -329,6 +330,7 @@
     <div class="modal" role="document">
       <button id="goRoutineBtn" aria-label="Ir para a rotina">Routine</button>
       <button id="changeAvatarBtn" aria-label="Trocar foto de perfil">Change Profile</button>
+      <button id="sendMessageBtn" aria-label="Enviar mensagem">Send Message</button>
 
       <div class="avatar-history" id="avatarHistory" style="display:none;" aria-label="Histórico de avatares"></div>
       <label for="avatarUploadInput" class="upload-label" style="display:none;" id="uploadLabel">Enviar imagem própria</label>
@@ -392,6 +394,7 @@
   const modal = document.getElementById('modalBackdrop');
   const goRoutineBtn = document.getElementById('goRoutineBtn');
   const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+  const sendMessageBtn = document.getElementById('sendMessageBtn');
   const avatarHistory = document.getElementById('avatarHistory');
   const uploadLabel = document.getElementById('uploadLabel');
   const avatarUploadInput = document.getElementById('avatarUploadInput');
@@ -408,6 +411,7 @@
 
     goRoutineBtn.style.display = 'block';
     changeAvatarBtn.style.display = 'block';
+    sendMessageBtn.style.display = 'block';
 
     goRoutineBtn.focus();
   }
@@ -534,6 +538,13 @@
 
     const firstAvatar = avatarHistory.querySelector('img');
     if(firstAvatar) firstAvatar.focus();
+  });
+
+  sendMessageBtn.addEventListener('click', () => {
+    if(selectedUser) {
+      // Abre messages.html numa nova aba, passando o usuário
+       window.location.href = `messages.html?user=${encodeURIComponent(selectedUser)}`;
+    }
   });
 
   avatarUploadInput.addEventListener('change', () => {
